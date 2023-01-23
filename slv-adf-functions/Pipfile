@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+"azure.functions" = "*"
+azure-functions-worker = "*"
+azure-functions = "*"
+python-dotenv = "*"
+psycopg2 = "*"
+requests = "*"
+azure-identity = "*"
+azure-keyvault-secrets = "*"
+pyodbc = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
