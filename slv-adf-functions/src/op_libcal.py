@@ -1,4 +1,5 @@
 import os
+import logging
 from dotenv import load_dotenv
 from datetime import date, timedelta, datetime
 import requests
@@ -56,7 +57,7 @@ def get_libcal_information(endpoint):
     r = requests.get(f'{libcal_url}{endpoint}', headers=headers)
 
     if r.status_code != 200:
-        print(r.text)
+        logging.error(r.text)
         return False
     
     return r.json()
@@ -120,19 +121,18 @@ def get_booking_data_to_upload(environment):
         bool: False flag returned if the process doesn't complete
         list: List of nested lists containing metadata extracted from the LibCal API 
     """
-    print(f'Retrieving LibCal data for {environment} environment')
+    logging.info(f'Retrieving LibCal data for {environment} environment')
     # Calculate no. of days since last update. If it's less than the APIs max days (365) add to the query param
     last_date_retrieved = get_most_recent_date_in_db(environment,prepend='stg')
     if not last_date_retrieved:
-        print('Unable to retrieve most recent date from database')
+        logging.error('Unable to retrieve most recent date from database')
         return False
 
-    print(f'Last date retrieved: {last_date_retrieved}')
+    logging.info(f'Last date retrieved: {last_date_retrieved}')
 
     date_to_check = get_most_recent_booking()
     returned_values_upload_list = []
     try:
-        # days_since_last_update = 1
         days_since_last_update = date_to_check - last_date_retrieved
         days_since_last_update = int(days_since_last_update.days)
         while days_since_last_update > 0:
@@ -156,11 +156,11 @@ def get_booking_data_to_upload(environment):
 
             #* datetime.strptime(element[5],'%Y-%m-%dT%H:%M:%S%z').date() is a complicated way of converting the string returned by the API into a date format
             last_date_retrieved = max([datetime.strptime(element[5],'%Y-%m-%dT%H:%M:%S%z').date() for element in returned_values_upload_list])
-            print(f'Data retrieved up to: {last_date_retrieved}')
+            logging.info(f'Data retrieved up to: {last_date_retrieved}')
     
     except Exception as e:
-        print(f"The following error occurred: {e}. Process aborted")
+        logging.error(f"The following error occurred: {e}. Process aborted")
         return False
     
-    print('Completed LibCal data extraction')
+    logging.info('Completed LibCal data extraction')
     return returned_values_upload_list

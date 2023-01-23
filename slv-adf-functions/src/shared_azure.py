@@ -1,5 +1,6 @@
 from datetime import datetime, date
 import os
+import logging
 
 from azure.identity import ClientSecretCredential
 from azure.keyvault.secrets import SecretClient
@@ -23,7 +24,7 @@ def get_key_vault_secret(secret_to_retrieve, vault_url):
     sql_connection_string = client.get_secret(secret_to_retrieve)
 
     if not sql_connection_string.value:
-        print('Unable to retrieve key vault secret')
+        logging.warning('Unable to retrieve key vault secret')
         return False
 
     return sql_connection_string.value
@@ -34,7 +35,7 @@ def check_if_table_exists(environment,prepend=False):
     if prepend:
         table_name = f'{prepend}_{table_name}'
     
-    print(f'Checking if table: {table_name} already exists in {environment} database')
+    logging.info(f'Checking if table: {table_name} already exists in {environment} database')
 
     sql = f"""
         SELECT *
@@ -45,10 +46,10 @@ def check_if_table_exists(environment,prepend=False):
     res = query_azure_database(sql, environment, return_data=True)
 
     if len(res) == 0:
-        print(f'{table_name} does not exist')
+        logging.info(f'{table_name} does not exist')
         return False
 
-    print(f'{table_name} does exist')
+    logging.info(f'{table_name} does exist')
     return True
 
 def query_azure_database(sql_statement,environment='dev',return_data=False):
@@ -68,7 +69,7 @@ def query_azure_database(sql_statement,environment='dev',return_data=False):
 
         return data_to_return
     except Exception as e:
-        print(f'Could not complete sql query. Here is the exception returned: {e}')
+        logging.error(f'Could not complete sql query. Here is the exception returned: {e}')
         
         return False
 
@@ -77,7 +78,7 @@ def create_azure_sql_table(environment, prepend=False ):
     table_name = DB_TABLE_NAME
     if prepend:
         table_name = f'{prepend}_{table_name}'
-    print(f'Created table "{table_name}" in {environment} database')
+    logging.info(f'Created table "{table_name}" in {environment} database')
 
     db_columns = [f'[{field}] [nvarchar](200) NULL' for field in API_FIELDS]
     columns_string = ','.join(db_columns)
@@ -118,7 +119,7 @@ def bulk_upload_azure_database(libcal_data,environment='dev',prepend=False):
     if prepend:
         table_name = f'{prepend}_{table_name}'
     
-    print(f'{len(libcal_data)} rows to be added to {table_name} in {environment} database')
+    logging.info(f'{len(libcal_data)} rows to be added to {table_name} in {environment} database')
 
     columns = ', '.join(API_FIELDS)
     placeholders = '?, ' * len(API_FIELDS)
@@ -134,8 +135,8 @@ def bulk_upload_azure_database(libcal_data,environment='dev',prepend=False):
         cursor.executemany(sql,libcal_data)
         con.commit()
         con.close()
-        print(f'Success: {len(libcal_data)} rows added to {table_name}')
+        logging.info(f'Success: {len(libcal_data)} rows added to {table_name}')
         return True
     except Exception as e:
-        print(f'Could not complete sql query. Here is the exception returned: {e}')
+        logging.error(f'Could not complete sql query. Here is the exception returned: {e}')
         return False

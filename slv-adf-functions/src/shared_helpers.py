@@ -1,5 +1,6 @@
 import os
 import csv
+import logging
 
 from dotenv import load_dotenv
 import psycopg2
@@ -37,7 +38,7 @@ def query_database(sql_statement, return_data=False):
         return data_to_return
 
     except Exception as e:
-        print(f'Could not complete sql query. Here is the exception returned: {e}')
+        logging.error(f'Could not complete sql query. Here is the exception returned: {e}')
         return False
 
 
