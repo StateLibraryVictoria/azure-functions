@@ -2,10 +2,10 @@ import os
 import csv
 import logging
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import psycopg2
 
-load_dotenv()
+# load_dotenv()
 
 host = os.environ.get('DB_HOST')
 dbname = os.environ.get('DB_NAME')

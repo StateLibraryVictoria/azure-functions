@@ -1,13 +1,11 @@
 import os
 import logging
-from dotenv import load_dotenv
 from datetime import date, timedelta, datetime
 import requests
-from shared_azure import get_most_recent_date_in_db
-from shared_constants import API_FIELDS
 
+from . import shared_azure
+from . import shared_constants
 
-load_dotenv()
 libcal_url = os.environ.get('LIBCAL_URL')
 libcal_client_secret = os.environ.get('LIBCAL_CLIENT_SECRET')
 libcal_client_id = os.environ.get('LIBCAL_CLIENT_ID')
@@ -110,11 +108,11 @@ def get_most_recent_booking():
 
 def format_booking_data(booking):
 
-    formatted_booking_info = [booking.get(field,'') for field in API_FIELDS]
+    formatted_booking_info = [booking.get(field,'') for field in shared_constants.API_FIELDS]
 
     return formatted_booking_info
 
-def get_booking_data_to_upload(environment):
+def get_booking_data_to_upload(environment, table_exists):
     """Polls the LibCal recursively from the last date recorded in the DB (or the default value if not present) and builds a list of lists containing the data to upload to the DB
 
     Returns:
@@ -122,8 +120,13 @@ def get_booking_data_to_upload(environment):
         list: List of nested lists containing metadata extracted from the LibCal API 
     """
     logging.info(f'Retrieving LibCal data for {environment} environment')
+
     # Calculate no. of days since last update. If it's less than the APIs max days (365) add to the query param
-    last_date_retrieved = get_most_recent_date_in_db(environment,prepend='stg')
+    last_date_retrieved = datetime.strptime(shared_constants.EARLIEST_DATE,'%Y-%m-%d').date()
+    
+    if table_exists:
+        last_date_retrieved = shared_azure.get_most_recent_date_in_db(environment,prefix='stg')
+
     if not last_date_retrieved:
         logging.error('Unable to retrieve most recent date from database')
         return False
@@ -164,3 +167,11 @@ def get_booking_data_to_upload(environment):
     
     logging.info('Completed LibCal data extraction')
     return returned_values_upload_list
+
+# def test(thing):
+    # logging.info(thing)
+    # logging.info(f'URL: {libcal_url}')
+    # logging.info(f'Secret: {len(libcal_client_secret)}')
+    # logging.info(f'ID: {libcal_client_id}')
+    # shared_azure.test('Op Libcal -> Shared Azure')
+    # shared_constants.test('Op Libcal -> Shared Constant')

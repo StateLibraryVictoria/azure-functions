@@ -1,32 +1,27 @@
 service: slv-adf-functions
-
 frameworkVersion: '3'
-
 provider:
   name: azure
   region: Australia Southeast
   runtime: python3.8
-  os: linux  # linux is the only operating system available for python
-  prefix: ${opt:stage}  # prefix of generated resource name
-  
-  subscriptionId: ${file(./config.json):${opt:stage}}
-  stage: ${opt:stage}
-  useDotenv: true # makes variables stored in .env available
-
+  os: linux
+  prefix: app
+  subscriptionId: '${file(./config.json):${opt:stage}}'
+  stage: '${opt:stage}'
+  useDotenv: true
   environment:
-    ENVIRONMENT: ${opt:stage}
-    AZURE_TENANT_ID: $AZURE_TENANT_ID
-    AZURE_CLIENT_ID: $AZURE_CLIENT_ID
-    AZURE_CLIENT_SECRET: $AZURE_CLIENT_SECRET
-    AZURE_DEV_SUB_ID: $AZURE_DEV_SUB_ID
-    LIBCAL_CLIENT_SECRET : $LIBCAL_CLIENT_SECRET 
-    LIBCAL_CLIENT_ID : $LIBCAL_CLIENT_ID 
-    LIBCAL_URL : $LIBCAL_URL 
+    ENVIRONMENT: '${opt:stage}'
+    AZURE_TENANT_ID: ${env:AZURE_TENANT_ID}
+    AZURE_CLIENT_ID: ${env:AZURE_CLIENT_ID}
+    AZURE_CLIENT_SECRET: ${env:AZURE_CLIENT_SECRET}
+    AZURE_DEV_SUB_ID: ${env:AZURE_DEV_SUB_ID}
+    LIBCAL_CLIENT_SECRET: ${env:LIBCAL_CLIENT_SECRET}
+    LIBCAL_CLIENT_ID: ${env:LIBCAL_CLIENT_ID}
+    LIBCAL_URL: ${env:LIBCAL_URL}
+    TEST_KEY: TEST_VALUE 
 
 plugins:
   - serverless-azure-functions
-
-# you can add packaging information here
 package:
   patterns:
     - '!env/**'
@@ -41,14 +36,13 @@ package:
     - '!package-lock.json'
     - '!.gitignore'
     - '!.git/**'
-
-
 functions:
-  timer:
-    handler: src/handlers/timer.main
+  libcal:
+    handler: src/handlers/libcal.main
     events:
       - timer: true
         name: myTimer
         x-azure-settings:
-          schedule: '15,45 * * * * *'
-
+          schedule: 0, 15, 30, 45 * * * *
+          # schedule: 0 30 7 * * *
+    name: slv-adf-functions-dev-libcal

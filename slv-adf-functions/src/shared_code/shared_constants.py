@@ -1,3 +1,5 @@
+import logging
+
 AZURE_VARIABLES = {
     'test': 'https://slv-test-sqldw-kv.vault.azure.net/',
     'dev' : 'https://slv-dev-sqldw-kv.vault.azure.net/',
@@ -18,3 +20,7 @@ API_FIELDS = [
 DB_TABLE_NAME = 'libcal_bookings'
 
 EARLIEST_DATE='2020-01-01'
+
+def test(thing):
+
+    logging.info(thing)
