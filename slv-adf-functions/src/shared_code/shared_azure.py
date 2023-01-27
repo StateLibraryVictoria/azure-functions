@@ -8,26 +8,42 @@ import pyodbc
 
 from . import shared_constants
 
-
 def get_key_vault_secret(secret_to_retrieve, vault_url):
+    """Retrieves a secret from Azure Key Vault
+
+    Args:
+        secret_to_retrieve (str): Name of the key to retrieve (must match exactly the name in hte Azure key vault)
+        vault_url (str): URL for the vault
+
+    Returns:
+        bool: False flag returned to indicate that the function failed
+        str: The key vault secret value
+    """
     azure_client_id = os.environ.get('AZURE_CLIENT_ID')
     azure_client_secret = os.environ.get('AZURE_CLIENT_SECRET')
     azure_tenant_id = os.environ.get('AZURE_TENANT_ID')
 
     credentials = ClientSecretCredential(client_id=azure_client_id, client_secret=azure_client_secret,tenant_id=azure_tenant_id)
     client = SecretClient(credential=credentials, vault_url=vault_url)
-    sql_connection_string = client.get_secret(secret_to_retrieve)
+    key_vault_secret = client.get_secret(secret_to_retrieve)
 
 
-    if not sql_connection_string.value:
+    if not key_vault_secret.value:
         logging.warning('Unable to retrieve key vault secret')
         return False
 
-    logging.info(f'Retrieved secret: {sql_connection_string.value}')
-    return sql_connection_string.value
+    return key_vault_secret.value
 
 def check_if_table_exists(environment,prefix=False):
+    """ Checks if a database table exists
 
+    Args:
+        environment (str): Staging environment (Valid values dev, test or prod)
+        prefix (bool, optional): Prefix for the database table name to check. Default is false
+    
+    Returns:
+        bool: Flag to indicate success of the function
+    """
     table_name = shared_constants.DB_TABLE_NAME
     if prefix:
         table_name = f'{prefix}_{table_name}'
@@ -49,8 +65,18 @@ def check_if_table_exists(environment,prefix=False):
     logging.info(f'{table_name} does exist')
     return True
 
-def query_azure_database(sql_statement,environment='dev',return_data=False):
+def query_azure_database(sql_statement,environment,return_data=False):
+    """Queries Azure SQL database
 
+    Args:
+        sql_statement (str): SQL query to run against the databse
+        environment (str): Staging environment (Valid values dev, test or prod).
+        return_data (bool, optional): Flag to indicate whether to return the result of the successful SQL query. Defaults to False.
+
+    Returns:
+        bool: Flag to indicate success of the function
+        list: Data returned by the SQL query
+    """
     username = os.environ.get('SQL_ADMIN_USER')
     password = os.environ.get('SQL_ADMIN_PASSWORD')
     
@@ -91,7 +117,16 @@ def create_azure_sql_table(environment, prefix=False ):
 
 
 def get_most_recent_date_in_db(environment, prefix=False):
+    """Retrieves the most recent date recorded in the database
 
+    Args:
+        environment (str): Staging environment (Valid values dev, test or prod)
+        prefix (bool, optional): Prefix for the database table name to check. Default is false
+
+    Returns:
+        bool: False flag to indicate an error occurred
+        date: Most recent date in the database
+    """
     table_name = shared_constants.DB_TABLE_NAME
     if prefix:
         table_name = f'{prefix}_{shared_constants.DB_TABLE_NAME}'
@@ -104,18 +139,28 @@ def get_most_recent_date_in_db(environment, prefix=False):
     top_date_in_db = query_azure_database(sql_statement, environment=environment, return_data=True)
 
     if not top_date_in_db:
-        return datetime.strptime(shared_constants.EARLIEST_DATE,'%Y-%m-%d').date()
+        logging.error(f'Could not retrieve the most recent date from {table_name}')
+        return False
 
     return datetime.strptime(top_date_in_db[0][0],'%Y-%m-%dT%H:%M:%S%z').date()
 
 
-def bulk_upload_azure_database(libcal_data,environment='dev',prefix=False):
+def bulk_upload_azure_database(data_for_upload,environment,prefix=False):
+    """Upload list of lists to Azure SQL database
 
+    Args:
+        data_for_upload (list): formatted list of data for upload to Azure
+        environment (str): Staging environment (Valid values dev, test or prod)
+        prefix (bool, optional): Prefix for the database table name to check. Default is false
+    
+    Returns:
+        bool: Flag to indicate success of the function
+    """
     table_name = shared_constants.DB_TABLE_NAME
     if prefix:
         table_name = f'{prefix}_{table_name}'
     
-    logging.info(f'{len(libcal_data)} rows to be added to {table_name} in {environment} database')
+    logging.info(f'{len(data_for_upload)} rows to be added to {table_name} in {environment} database')
 
     columns = ', '.join(shared_constants.API_FIELDS)
     placeholders = '?, ' * len(shared_constants.API_FIELDS)
@@ -128,10 +173,10 @@ def bulk_upload_azure_database(libcal_data,environment='dev',prefix=False):
     try:
         con = pyodbc.connect(connection_string)
         cursor = con.cursor()
-        cursor.executemany(sql,libcal_data)
+        cursor.executemany(sql,data_for_upload)
         con.commit()
         con.close()
-        logging.info(f'Success: {len(libcal_data)} rows added to {table_name}')
+        logging.info(f'Success: {len(data_for_upload)} rows added to {table_name}')
         return True
     except Exception as e:
         logging.error(f'Could not complete sql query. Here is the exception returned: {e}')

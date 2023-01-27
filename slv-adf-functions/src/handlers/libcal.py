@@ -5,6 +5,11 @@ import azure.functions as func
 from ..shared_code import op_azure_sql
 
 def main(myTimer: func.TimerRequest) -> None:
+    """Handler for triggering the Libcal/Azure operations
+
+    Args:
+        myTimer (func.TimerRequest): matches the trigger configured in serverless.yaml
+    """
 
     logging.info('Beginning Libcal operation')
 

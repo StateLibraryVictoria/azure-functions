@@ -107,13 +107,24 @@ def get_most_recent_booking():
     return most_recent_booking
 
 def format_booking_data(booking):
+    """Re-formats a booking by pulling out the fields supplied in the API FIELDS list
 
+    Args:
+        booking (dict): An entry returned by the Libcal API
+
+    Returns:
+        list: List of values filtered from the booking argument supplied
+    """
     formatted_booking_info = [booking.get(field,'') for field in shared_constants.API_FIELDS]
 
     return formatted_booking_info
 
 def get_booking_data_to_upload(environment, last_date_retrieved):
     """Polls the LibCal recursively from the last date recorded in the DB (or the default value if not present) and builds a list of lists containing the data to upload to the DB
+
+    Args:
+        environment (str): Staging environment (Valid values dev, test or prod)
+        last_date_retrieved (datetime): Last date recorded in DB, or default value if none recorded in DB
 
     Returns:
         bool: False flag returned if the process doesn't complete

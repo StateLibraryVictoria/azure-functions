@@ -2,15 +2,8 @@ import os
 import csv
 import logging
 
-# from dotenv import load_dotenv
 import psycopg2
 
-# load_dotenv()
-
-host = os.environ.get('DB_HOST')
-dbname = os.environ.get('DB_NAME')
-user = os.environ.get('DB_USER')
-password = os.environ.get('DB_PASSWORD')
 
 
 def query_database(sql_statement, return_data=False):
@@ -24,6 +17,10 @@ def query_database(sql_statement, return_data=False):
         bool: Will return True/False flag to indicate that the SQL statement was successfully run
         list: Data returned from the database
     """
+    host = os.environ.get('DB_HOST')
+    dbname = os.environ.get('DB_NAME')
+    user = os.environ.get('DB_USER')
+    password = os.environ.get('DB_PASSWORD')
     try :
         data_to_return = True
         conn = psycopg2.connect(host=host,dbname=dbname, user=user, password=password)
