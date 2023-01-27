@@ -112,7 +112,7 @@ def format_booking_data(booking):
 
     return formatted_booking_info
 
-def get_booking_data_to_upload(environment, table_exists):
+def get_booking_data_to_upload(environment, last_date_retrieved):
     """Polls the LibCal recursively from the last date recorded in the DB (or the default value if not present) and builds a list of lists containing the data to upload to the DB
 
     Returns:
@@ -120,19 +120,7 @@ def get_booking_data_to_upload(environment, table_exists):
         list: List of nested lists containing metadata extracted from the LibCal API 
     """
     logging.info(f'Retrieving LibCal data for {environment} environment')
-
     # Calculate no. of days since last update. If it's less than the APIs max days (365) add to the query param
-    last_date_retrieved = datetime.strptime(shared_constants.EARLIEST_DATE,'%Y-%m-%d').date()
-    
-    if table_exists:
-        last_date_retrieved = shared_azure.get_most_recent_date_in_db(environment,prefix='stg')
-
-    if not last_date_retrieved:
-        logging.error('Unable to retrieve most recent date from database')
-        return False
-
-    logging.info(f'Last date retrieved: {last_date_retrieved}')
-
     date_to_check = get_most_recent_booking()
     returned_values_upload_list = []
     try:
@@ -167,11 +155,3 @@ def get_booking_data_to_upload(environment, table_exists):
     
     logging.info('Completed LibCal data extraction')
     return returned_values_upload_list
-
-# def test(thing):
-    # logging.info(thing)
-    # logging.info(f'URL: {libcal_url}')
-    # logging.info(f'Secret: {len(libcal_client_secret)}')
-    # logging.info(f'ID: {libcal_client_id}')
-    # shared_azure.test('Op Libcal -> Shared Azure')
-    # shared_constants.test('Op Libcal -> Shared Constant')

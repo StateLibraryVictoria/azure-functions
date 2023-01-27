@@ -18,7 +18,8 @@ provider:
     LIBCAL_CLIENT_SECRET: ${env:LIBCAL_CLIENT_SECRET}
     LIBCAL_CLIENT_ID: ${env:LIBCAL_CLIENT_ID}
     LIBCAL_URL: ${env:LIBCAL_URL}
-    TEST_KEY: TEST_VALUE 
+    SQL_ADMIN_USER: ''
+    SQL_ADMIN_PASSWORD: ''
 
 plugins:
   - serverless-azure-functions
@@ -43,6 +44,5 @@ functions:
       - timer: true
         name: myTimer
         x-azure-settings:
-          schedule: 0, 15, 30, 45 * * * *
-          # schedule: 0 30 7 * * *
+          schedule: 0 30 7 * * * # Runs daily at 7:30AM
     name: slv-adf-functions-dev-libcal

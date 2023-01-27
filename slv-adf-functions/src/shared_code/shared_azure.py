@@ -121,20 +121,19 @@ def bulk_upload_azure_database(libcal_data,environment='dev',prefix=False):
     placeholders = '?, ' * len(shared_constants.API_FIELDS)
     placeholders = placeholders[:-2]
     
-    # sql = f'INSERT INTO [{table_name}] ({columns}) VALUES ({placeholders})'
-    # username = os.environ.get('SQL_ADMIN_USER')
-    # password = os.environ.get('SQL_ADMIN_PASSWORD')
-    # connection_string = f"Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:slv-{environment}-sqldw.database.windows.net,1433;Database={environment}-edw;Uid={username};Pwd={{{password}}};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
-    # try:
-    #     con = pyodbc.connect(connection_string)
-    #     cursor = con.cursor()
-    #     cursor.executemany(sql,libcal_data)
-    #     con.commit()
-    #     con.close()
-    #     logging.info(f'Success: {len(libcal_data)} rows added to {table_name}')
-    #     return True
-    # except Exception as e:
-    #     logging.error(f'Could not complete sql query. Here is the exception returned: {e}')
-    #     return False
-    return True
+    sql = f'INSERT INTO [{table_name}] ({columns}) VALUES ({placeholders})'
+    username = os.environ.get('SQL_ADMIN_USER')
+    password = os.environ.get('SQL_ADMIN_PASSWORD')
+    connection_string = f"Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:slv-{environment}-sqldw.database.windows.net,1433;Database={environment}-edw;Uid={username};Pwd={{{password}}};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    try:
+        con = pyodbc.connect(connection_string)
+        cursor = con.cursor()
+        cursor.executemany(sql,libcal_data)
+        con.commit()
+        con.close()
+        logging.info(f'Success: {len(libcal_data)} rows added to {table_name}')
+        return True
+    except Exception as e:
+        logging.error(f'Could not complete sql query. Here is the exception returned: {e}')
+        return False
 
