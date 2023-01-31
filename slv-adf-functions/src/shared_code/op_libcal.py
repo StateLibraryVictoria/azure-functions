@@ -177,7 +177,7 @@ def get_booking_data_to_upload(environment, last_date_retrieved):
             # * datetime.strptime(element[5],'%Y-%m-%dT%H:%M:%S%z').date() is a complicated way of converting the string returned by the API into a date format
             last_date_retrieved = max(
                 [
-                    datetime.strptime(element[5], "%Y-%m-%dT%H:%M:%S%z").date()
+                    datetime.strptime(element[6], "%Y-%m-%dT%H:%M:%S%z").date()
                     for element in returned_values_upload_list
                 ]
             )

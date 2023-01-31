@@ -9,6 +9,7 @@ API_FIELDS = [
     "eid",
     "location_name",
     "category_name",
+    "item_name",
     "status",
     "fromDate",
     "toDate",

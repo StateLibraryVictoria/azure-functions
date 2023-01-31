@@ -155,7 +155,8 @@ def get_most_recent_date_in_db(environment, prefix=False):
 
     if not top_date_in_db:
         logging.error(f"Could not retrieve the most recent date from {table_name}")
-        return False
+        logging.info(f"Reverting to default date {shared_constants.EARLIEST_DATE}")
+        return datetime.strptime(shared_constants.EARLIEST_DATE, "%Y-%m-%d").date()
 
     return datetime.strptime(top_date_in_db[0][0], "%Y-%m-%dT%H:%M:%S%z").date()
 
