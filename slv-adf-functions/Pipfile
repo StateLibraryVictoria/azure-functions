@@ -13,6 +13,7 @@ requests = "*"
 azure-identity = "*"
 azure-keyvault-secrets = "*"
 pyodbc = "*"
+pre-commit = "*"
 
 [dev-packages]
 

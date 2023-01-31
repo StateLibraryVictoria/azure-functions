@@ -1,14 +1,15 @@
-import os
 import logging
-from datetime import date, timedelta, datetime
+import os
+from datetime import date, datetime, timedelta
+
 import requests
 
-from . import shared_azure
-from . import shared_constants
+from . import shared_azure, shared_constants
 
-libcal_url = os.environ.get('LIBCAL_URL')
-libcal_client_secret = os.environ.get('LIBCAL_CLIENT_SECRET')
-libcal_client_id = os.environ.get('LIBCAL_CLIENT_ID')
+libcal_url = os.environ.get("LIBCAL_URL")
+libcal_client_secret = os.environ.get("LIBCAL_CLIENT_SECRET")
+libcal_client_id = os.environ.get("LIBCAL_CLIENT_ID")
+
 
 def get_access_token():
     """Retrieves access token for the LibCal API. The client_id and client_secret values are read from environmental variables
@@ -18,19 +19,20 @@ def get_access_token():
         string:  the access token
     """
     payload = {
-        "client_id" : libcal_client_id,
-        "client_secret" : libcal_client_secret,
-        "grant_type" : "client_credentials"
+        "client_id": libcal_client_id,
+        "client_secret": libcal_client_secret,
+        "grant_type": "client_credentials",
     }
 
-    r = requests.post(f'{libcal_url}oauth/token', json=payload)
+    r = requests.post(f"{libcal_url}oauth/token", json=payload)
 
     if r.status_code != 200:
         return False
-    
-    access_token = r.json()['access_token']
+
+    access_token = r.json()["access_token"]
 
     return access_token
+
 
 def get_libcal_information(endpoint):
     """Retrieves information from one of the LibCal API endpoints, will only work for endpoints using the 'get' protocol
@@ -44,31 +46,31 @@ def get_libcal_information(endpoint):
     """
 
     access_token = get_access_token()
-    
+
     if not access_token:
         return False
 
-    headers = {
-        "Authorization" : f'Bearer {access_token}'
-    }
-    
-    r = requests.get(f'{libcal_url}{endpoint}', headers=headers)
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    r = requests.get(f"{libcal_url}{endpoint}", headers=headers)
 
     if r.status_code != 200:
         logging.error(r.text)
         return False
-    
+
     return r.json()
 
+
 def get_locations():
-    """Retrieves information from the LibCal 'location' API endpoint 
+    """Retrieves information from the LibCal 'location' API endpoint
 
     Returns:
         dict: JSON containing information returned by the endpoint
     """
-    locations = get_libcal_information('space/locations')
+    locations = get_libcal_information("space/locations")
 
     return locations
+
 
 def get_bookings(date_to_retrieve=False, days=365, page=1, limit=500):
     """Retrieves booking information from the LibCal API
@@ -83,9 +85,11 @@ def get_bookings(date_to_retrieve=False, days=365, page=1, limit=500):
         list: list of dicts containing booking information
     """
     if not date_to_retrieve:
-        date_to_retrieve = date.today().strftime('%Y-%m-%d')
+        date_to_retrieve = date.today().strftime("%Y-%m-%d")
 
-    bookings = get_libcal_information(f'space/bookings?date={date_to_retrieve}&days={days}&limit={limit}&page={page}')
+    bookings = get_libcal_information(
+        f"space/bookings?date={date_to_retrieve}&days={days}&limit={limit}&page={page}"
+    )
 
     return bookings
 
@@ -98,13 +102,16 @@ def get_most_recent_booking():
         date: First date from today backwards that return a non empty list from the LibCal API
     """
     most_recent_booking = date.today()
-    most_recent_bookings = get_bookings(date_to_retrieve=most_recent_booking,limit=1,days=1)
+    most_recent_bookings = get_bookings(
+        date_to_retrieve=most_recent_booking, limit=1, days=1
+    )
 
     while len(most_recent_bookings) == 0:
         most_recent_booking = most_recent_booking - timedelta(days=1)
-        most_recent_bookings = get_bookings(date=most_recent_booking,limit=1,days=1)
+        most_recent_bookings = get_bookings(date=most_recent_booking, limit=1, days=1)
 
     return most_recent_booking
+
 
 def format_booking_data(booking):
     """Re-formats a booking by pulling out the fields supplied in the API FIELDS list
@@ -115,12 +122,15 @@ def format_booking_data(booking):
     Returns:
         list: List of values filtered from the booking argument supplied
     """
-    formatted_booking_info = [booking.get(field,'') for field in shared_constants.API_FIELDS]
+    formatted_booking_info = [
+        booking.get(field, "") for field in shared_constants.API_FIELDS
+    ]
 
     return formatted_booking_info
 
+
 def get_booking_data_to_upload(environment, last_date_retrieved):
-    """Polls the LibCal recursively from the last date recorded in the DB (or the default value if not present) and builds a list of lists containing the data to upload to the DB
+    """Polls the LibCal API recursively from the last date recorded in the DB (or the default value if not present) and builds a list of lists containing the data to upload to the DB
 
     Args:
         environment (str): Staging environment (Valid values dev, test or prod)
@@ -128,9 +138,9 @@ def get_booking_data_to_upload(environment, last_date_retrieved):
 
     Returns:
         bool: False flag returned if the process doesn't complete
-        list: List of nested lists containing metadata extracted from the LibCal API 
+        list: List of nested lists containing metadata extracted from the LibCal API
     """
-    logging.info(f'Retrieving LibCal data for {environment} environment')
+    logging.info(f"Retrieving LibCal data for {environment} environment")
     # Calculate no. of days since last update. If it's less than the APIs max days (365) add to the query param
     date_to_check = get_most_recent_booking()
     returned_values_upload_list = []
@@ -140,29 +150,42 @@ def get_booking_data_to_upload(environment, last_date_retrieved):
         while days_since_last_update > 0:
             days_since_last_update = date_to_check - last_date_retrieved
             days_since_last_update = int(days_since_last_update.days)
-            days = min(days_since_last_update,365)
+            days = min(days_since_last_update, 365)
 
             # Query bookings API from most recent date added recursively using page param until len of returned values is less than limit
-            #* Do not include any bookings after 'today'
+            # * Do not include any bookings after 'today'
             page_counter = 1
-            bookings_info = get_bookings(date_to_retrieve=last_date_retrieved,days=days, page=page_counter)
+            bookings_info = get_bookings(
+                date_to_retrieve=last_date_retrieved, days=days, page=page_counter
+            )
 
-            values_for_upload = [format_booking_data(booking) for booking in bookings_info]
+            values_for_upload = [
+                format_booking_data(booking) for booking in bookings_info
+            ]
             returned_values_upload_list.extend(values_for_upload)
 
             while len(bookings_info) > 0:
                 page_counter += 1
-                bookings_info = get_bookings(date_to_retrieve=last_date_retrieved,days=days, page=page_counter)
-                values_for_upload = [format_booking_data(booking) for booking in bookings_info]
+                bookings_info = get_bookings(
+                    date_to_retrieve=last_date_retrieved, days=days, page=page_counter
+                )
+                values_for_upload = [
+                    format_booking_data(booking) for booking in bookings_info
+                ]
                 returned_values_upload_list.extend(values_for_upload)
 
-            #* datetime.strptime(element[5],'%Y-%m-%dT%H:%M:%S%z').date() is a complicated way of converting the string returned by the API into a date format
-            last_date_retrieved = max([datetime.strptime(element[5],'%Y-%m-%dT%H:%M:%S%z').date() for element in returned_values_upload_list])
-            logging.info(f'Data retrieved up to: {last_date_retrieved}')
-    
+            # * datetime.strptime(element[5],'%Y-%m-%dT%H:%M:%S%z').date() is a complicated way of converting the string returned by the API into a date format
+            last_date_retrieved = max(
+                [
+                    datetime.strptime(element[5], "%Y-%m-%dT%H:%M:%S%z").date()
+                    for element in returned_values_upload_list
+                ]
+            )
+            logging.info(f"Data retrieved up to: {last_date_retrieved}")
+
     except Exception as e:
         logging.error(f"The following error occurred: {e}. Process aborted")
         return False
-    
-    logging.info('Completed LibCal data extraction')
+
+    logging.info("Completed LibCal data extraction")
     return returned_values_upload_list

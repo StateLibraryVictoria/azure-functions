@@ -4,18 +4,24 @@ import azure.functions as func
 
 from ..shared_code import op_azure_sql
 
-def main(myTimer: func.TimerRequest) -> None:
+
+def main(req: func.HttpRequest) -> func.HttpResponse:
     """Handler for triggering the Libcal/Azure operations
 
     Args:
-        myTimer (func.TimerRequest): matches the trigger configured in serverless.yaml
+        req (func.HttpRequest): matches the trigger configured in serverless.yaml
     """
 
-    logging.info('Beginning Libcal operation')
+    logging.info("Beginning Libcal operation")
 
     upload_complete = op_azure_sql.upload_libcal_data_to_azure()
 
     if not upload_complete:
-        logging.warning('Upload could not be completed')
+        msg = "Upload could not be completed"
+        logging.warning(msg)
     else:
-        logging.info('Upload complete!')
+        msg = "Upload complete"
+        logging.info(msg)
+
+    response = {"data": upload_complete, "message": msg}
+    return str(response)

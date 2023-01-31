@@ -41,8 +41,17 @@ functions:
   libcal:
     handler: src/handlers/libcal.main
     events:
-      - timer: true
-        name: myTimer
+      - http: true
+        methods:
+          - get
+          - post
         x-azure-settings:
-          schedule: 0 30 7 * * * # Runs daily at 7:30AM
-    name: slv-adf-functions-dev-libcal
+          authLevel: anonymous
+  # libcal:
+  #   handler: src/handlers/libcal.main
+  #   events:
+  #     - timer: true
+  #       name: myTimer
+  #       x-azure-settings:
+  #         schedule: 0 30 7 * * * # Runs daily at 7:30AM
+  #   name: slv-adf-functions-dev-libcal
