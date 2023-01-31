@@ -18,6 +18,12 @@ This repo uses the [serverless framework](https://www.serverless.com/) to help m
 - authentication is done via the ['adf-app'](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/0dcd68a1-78a1-4f45-bd0b-0be230e57e45/isMSAApp~/false) Service Principal. Follow this guide to set-up your credentials locally: [https://www.serverless.com/framework/docs/providers/azure/guide/credentials](https://www.serverless.com/framework/docs/providers/azure/guide/credentials)
   - **n.b.** these credentials will need to be added to the [`.env`](#environmental-variables) file
 
+### Pre-commit hooks
+
+This repo uses [https://pre-commit.com/](https://pre-commit.com/) to call 'hooks' each time changes are committed in git. Essentially these hooks are a series formatting scripts that help to create consistency and aid maintainability in the codebase.
+
+The hooks are configured in the `.pre-commit.config.yaml` file. To install and enable the hooks ensure that `pre-commit` is installed (it is included in the repo's `Pipfile` and `requirements.txt`) and then run the command `pre-commit install`. The hooks will now run each time a commit is made.
+
 ## Azure Functions
 
 Azure Function Apps ('Apps') are used to group together Azure Functions ('Functions'), this maps directly to each Serverless project that is set up. Therefore in this repo, the App is everything contained within the [`slv-adf-functions`](/slv-adf-functions/) directory. The App maps to three versions deployed on Azure, organised by 'stage':
@@ -47,8 +53,8 @@ functions:
 
 The `shared_code` folder contains a mix of:
 
-- `shared_` helper functions that are designed to be used across multiple different functions
-- `op_` or operation functions that are more specific to each Function.
+- `shared_` helper functions that are designed to be used across multiple different Functions
+- `op_` or operation functions that are more specific to each Function
 
 <!-- todo should the directory structure be cleaned up a bit further? -->
 
@@ -58,10 +64,30 @@ In order to prevent sensitive information (keys, secrets, etc.) being published 
 
 These values are made available to Azure Functions via [Application Settings](https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-use-azure-function-app-settings?tabs=portal#settings). Most of the local environmental variables are deployed to the Application Settings via the [serverless.yml](/slv-adf-functions/serverless.yml) configuration, specifically under the `environment` key e.g. `AZURE_TENANT_ID: ${env:AZURE_TENANT_ID}`. The exceptions to this are the `SQL_ADMIN_USER` and `SQL_ADMIN_PASSWORD` which are tied to the stage (dev, test or prod). These are set via Azure and utilises Azure's key vault. This [blog](https://servian.dev/accessing-azure-key-vault-from-python-functions-44d548b49b37) gives a useful overview of how it's set-up.
 
-### LibCal
+### Deployment
+
+From within the [`slv-adf-functions`](/slv-adf-functions/) dir use the following command to deploy your code:
+
+```sh
+sls deploy -s <stage_name>
+```
+
+You must replace `<stage_name>` with one of the following values: `dev`, `test` or `prod`.
+
+Before deploying the function, it may be useful to invoke it locally for testing purposes. To do so run the following command, replacing `<function_name>` with the name of the Function as given in `serverless.yaml`:
+
+```sh
+sls invoke --function <function_name>
+```
+
+Link to serverless CLI `invoke` documentation - [https://www.serverless.com/framework/docs/providers/azure/cli-reference/invoke](https://www.serverless.com/framework/docs/providers/azure/cli-reference/invoke)
+
+## Deployed Functions
+
+### 1. LibCal
 
 LibCal is used by SLV to manage booking of its meeting rooms and other public spaces. This repo contains scripts to connect to the API and retrieve data to be stored in a database. This database can then be queried by Power BI to present the data in a useful way.
 
-### LibCal API
+#### LibCal API
 
 The LibCal API is authenticated through the use of client credentials. This script uses the existing 'SLV API' app, credentials for which can be found here [https://slv-vic.libcal.com/admin/api/authentication](https://slv-vic.libcal.com/admin/api/authentication). **N.B.** You will need a LibCal admin logon to access this page.
