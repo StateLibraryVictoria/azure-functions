@@ -91,3 +91,10 @@ LibCal is used by SLV to manage booking of its meeting rooms and other public sp
 #### LibCal API
 
 The LibCal API is authenticated through the use of client credentials. This script uses the existing 'SLV API' app, credentials for which can be found here [https://slv-vic.libcal.com/admin/api/authentication](https://slv-vic.libcal.com/admin/api/authentication). **N.B.** You will need a LibCal admin logon to access this page.
+
+#### Logging
+
+Logging related to the LibCal operation can be found at two different levels:
+
+1. At the 'Pipeline' level, which is scheduled to run daily and includes high level logging for each component of the pipeline, including the LibCal function: [link](https://adf.azure.com/en/monitoring/triggerruns?factory=%2Fsubscriptions%2Fb4a0deaa-b166-4231-b6b8-9b9a71a7c0d2%2FresourceGroups%2Fslv-dev-datafactory-rg%2Fproviders%2FMicrosoft.DataFactory%2Ffactories%2Fslv-dev-datafactory)
+2. At the Function level, which contains more detailed logging as defined in the code itself [link](https://portal.azure.com/#view/WebsitesExtension/FunctionMenuBlade/~/monitor/resourceId/%2Fsubscriptions%2Fb4a0deaa-b166-4231-b6b8-9b9a71a7c0d2%2FresourceGroups%2Fapp-ausse-dev-slv-adf-functions-rg%2Fproviders%2FMicrosoft.Web%2Fsites%2Fapp-ausse-dev-slv-adf-functions%2Ffunctions%2Flibcal)
