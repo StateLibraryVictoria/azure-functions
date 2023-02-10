@@ -201,3 +201,23 @@ def bulk_upload_azure_database(data_for_upload, environment, prefix=False):
             f"Could not complete sql query. Here is the exception returned: {e}"
         )
         return False
+
+
+def authenticate_by_client_token():
+
+    tenant_id = os.environ.get("AZURE_TENANT_ID")
+    app_id = os.environ.get("PBI_APPLICATION_ID")
+    client_secret = os.environ.get("PBI_SECRET")
+    auth = "https://analysis.windows.net/powerbi/api/.default"
+
+    credentials = ClientSecretCredential(
+        authority="https://login.microsoftonline.com/",
+        tenant_id=tenant_id,
+        client_id=app_id,
+        client_secret=client_secret,
+    )
+
+    access_token = credentials.get_token(auth)
+    access_token = access_token.token
+
+    return access_token

@@ -18,6 +18,8 @@ provider:
     LIBCAL_CLIENT_SECRET: ${env:LIBCAL_CLIENT_SECRET}
     LIBCAL_CLIENT_ID: ${env:LIBCAL_CLIENT_ID}
     LIBCAL_URL: ${env:LIBCAL_URL}
+    PBI_APPLICATION_ID: ${env:PBI_APPLICATION_ID}
+    PBI_SECRET: ${env:PBI_SECRET}
     SQL_ADMIN_USER: ''
     SQL_ADMIN_PASSWORD: ''
 
@@ -40,6 +42,15 @@ package:
 functions:
   libcal:
     handler: src/handlers/libcal.main
+    events:
+      - http: true
+        methods:
+          - get
+          - post
+        x-azure-settings:
+          authLevel: anonymous
+  power_bi_report:
+    handler: src/handlers/power_bi.main
     events:
       - http: true
         methods:

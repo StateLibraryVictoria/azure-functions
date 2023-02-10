@@ -19,3 +19,6 @@ API_FIELDS = [
 DB_TABLE_NAME = "libcal_bookings"
 
 EARLIEST_DATE = "2020-01-01"
+
+EZPROXY_FOLDER = "transferred2Azure"
+EZPROXY_SERVER = "//slvdata/ezproxyarchive"

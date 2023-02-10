@@ -25,19 +25,19 @@
         },
         "azure-core": {
             "hashes": [
-                "sha256:986bfd8687889782d79481d4c5d0af04ab4a18ca2f210364804a88e4eaa1586a",
-                "sha256:df306e6e4abc145610ca6744aef943129a6fd7a11977e56731f69ac0e00724f9"
+                "sha256:acbd0daa9675ce88623da35c80d819cdafa91731dee6b2695c64d7ca9da82db4",
+                "sha256:f7bad0a7b4d800d6e73733ea7e13a616016221ac111ff9a344fe4cba41e51bbe"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==1.26.2"
+            "version": "==1.26.3"
         },
         "azure-functions": {
             "hashes": [
-                "sha256:443b049652ede41e57a698230cc3848d20e5b53dff52bc4a636ee0820813f1b5",
-                "sha256:e8e470d87327f76fcc25a038757f38d19c0182091ed183bd2239505a4e61587a"
+                "sha256:6f00b2f148fade949e58db6704a0db545b07bc7cd386de55885b8679b1522b55",
+                "sha256:ba56f9d5e62c82c6980b075086ac351033aa3c246af22a20e1534965f5b90e00"
             ],
             "index": "pypi",
-            "version": "==1.12.0"
+            "version": "==1.13.2"
         },
         "azure-functions-worker": {
             "hashes": [
@@ -389,11 +389,11 @@
         },
         "identify": {
             "hashes": [
-                "sha256:1f4b36c5f50f3f950864b2a047308743f064eaa6f6645da5e5c780d1c7125487",
-                "sha256:c22aa206f47cc40486ecf585d27ad5f40adbfc494a3fa41dc3ed0499a23b123f"
+                "sha256:7d526dd1283555aafcc91539acc061d8f6f59adb0a7bba462735b0a318bff7ed",
+                "sha256:93cc61a861052de9d4c541a7acb7e3dcc9c11b398a2144f6e52ae5285f5f4f06"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==2.5.15"
+            "version": "==2.5.17"
         },
         "idna": {
             "hashes": [
@@ -412,10 +412,10 @@
         },
         "msal": {
             "hashes": [
-                "sha256:78344cd4c91d6134a593b5e3e45541e666e37b747ff8a6316c3668dd1e6ab6b2",
-                "sha256:d2f1c26368ecdc28c8657d457352faa0b81b1845a7b889d8676787721ba86792"
+                "sha256:96b5c867830fd116e5f7d0ec8ef1b238b4cda4d1aea86d8fecf518260e136fbf",
+                "sha256:e8444617c1eccdff7bb73f5d4f94036002accea4a2c05f8f39c9efb5bd2b0c6a"
             ],
-            "version": "==1.20.0"
+            "version": "==1.21.0"
         },
         "msal-extensions": {
             "hashes": [
@@ -466,11 +466,11 @@
         },
         "pre-commit": {
             "hashes": [
-                "sha256:3a3f9229e8c19a626a7f91be25b3c8c135e52de1a678da98eb015c0d0baea7a5",
-                "sha256:61ecb75e0e99939cc30c79181c0394545657855e9172c42ff98ebecb0e02fcb7"
+                "sha256:9e3255edb0c9e7fe9b4f328cb3dc86069f8fdc38026f1bf521018a05eaf4d67b",
+                "sha256:bc4687478d55578c4ac37272fe96df66f73d9b5cf81be6f28627d4e712e752d5"
             ],
             "index": "pypi",
-            "version": "==3.0.1"
+            "version": "==3.0.4"
         },
         "protobuf": {
             "hashes": [
@@ -666,11 +666,11 @@
         },
         "setuptools": {
             "hashes": [
-                "sha256:6f590d76b713d5de4e49fe4fbca24474469f53c83632d5d0fd056f7ff7e8112b",
-                "sha256:ac4008d396bc9cd983ea483cb7139c0240a07bbc74ffb6232fceffedc6cf03a8"
+                "sha256:16ccf598aab3b506593c17378473978908a2734d7336755a8769b480906bec1c",
+                "sha256:b440ee5f7e607bb8c9de15259dba2583dd41a38879a7abc1d43a71c59524da48"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==66.1.1"
+            "version": "==67.2.0"
         },
         "six": {
             "hashes": [
@@ -698,11 +698,11 @@
         },
         "virtualenv": {
             "hashes": [
-                "sha256:ce3b1684d6e1a20a3e5ed36795a97dfc6af29bc3970ca8dab93e11ac6094b3c4",
-                "sha256:f8b927684efc6f1cc206c9db297a570ab9ad0e51c16fa9e45487d36d1905c058"
+                "sha256:9d61e4ec8d2c0345dab329fb825eb05579043766a4b26a2f66b28948de68c722",
+                "sha256:f262457a4d7298a6b733b920a196bf8b46c8af15bf1fd9da7142995eff15118e"
             ],
-            "markers": "python_version >= '3.6'",
-            "version": "==20.17.1"
+            "markers": "python_version >= '3.7'",
+            "version": "==20.18.0"
         }
     },
     "develop": {}

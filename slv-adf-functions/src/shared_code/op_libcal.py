@@ -57,7 +57,7 @@ def get_libcal_information(endpoint):
     if r.status_code != 200:
         logging.error(r.text)
         return False
-
+    print(r.status_code)
     return r.json()
 
 
@@ -111,6 +111,13 @@ def get_most_recent_booking():
         most_recent_bookings = get_bookings(date=most_recent_booking, limit=1, days=1)
 
     return most_recent_booking
+
+
+def get_users():
+
+    users = get_libcal_information("appointments/bookings")
+
+    print(users)
 
 
 def format_booking_data(booking):
