@@ -31,8 +31,12 @@ def upload_libcal_data_to_azure():
     libcal_data_for_upload = op_libcal.get_booking_data_to_upload(
         environment, last_date_retrieved
     )
+    if libcal_data_for_upload == False:
+        logging.error("There was a problem retrieving data from LibCal")
+        return False
+
     if len(libcal_data_for_upload) == 0:
-        logging.error("No new data to extract from LibCal")
+        logging.warning("No new data to extract from LibCal")
         return False
 
     logging.info(f"{len(libcal_data_for_upload)} rows extracted from LibCal")

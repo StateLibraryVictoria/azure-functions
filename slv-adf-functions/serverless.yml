@@ -20,8 +20,8 @@ provider:
     LIBCAL_URL: ${env:LIBCAL_URL}
     PBI_APPLICATION_ID: ${env:PBI_APPLICATION_ID}
     PBI_SECRET: ${env:PBI_SECRET}
-    SQL_ADMIN_USER: ''
-    SQL_ADMIN_PASSWORD: ''
+    SQL_ADMIN_USER: ${env:SQL_ADMIN_USER}
+    SQL_ADMIN_PASSWORD: ${env:SQL_ADMIN_PASSWORD}
 
 plugins:
   - serverless-azure-functions
