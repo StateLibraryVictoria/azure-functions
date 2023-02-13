@@ -62,7 +62,9 @@ The `shared_code` folder contains a mix of:
 
 In order to prevent sensitive information (keys, secrets, etc.) being published to GitHub environmental variables have been used. A template `example.env` file has been created, simply add the relevant values and rename to `.env` to enable this code to be run locally.
 
-These values are made available to Azure Functions via [Application Settings](https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-use-azure-function-app-settings?tabs=portal#settings). Most of the local environmental variables are deployed to the Application Settings via the [serverless.yml](/slv-adf-functions/serverless.yml) configuration, specifically under the `environment` key e.g. `AZURE_TENANT_ID: ${env:AZURE_TENANT_ID}`. The exceptions to this are the `SQL_ADMIN_USER` and `SQL_ADMIN_PASSWORD` which are tied to the stage (dev, test or prod). These are set via Azure and utilises Azure's key vault. This [blog](https://servian.dev/accessing-azure-key-vault-from-python-functions-44d548b49b37) gives a useful overview of how it's set-up.
+These values are made available to Azure Functions via [Application Settings](https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-use-azure-function-app-settings?tabs=portal#settings). Most of the local environmental variables are deployed to the Application Settings via the [serverless.yml](/slv-adf-functions/serverless.yml) configuration, specifically under the `environment` key e.g. `AZURE_TENANT_ID: ${env:AZURE_TENANT_ID}`.
+
+The exceptions to this are the `SQL_ADMIN_USER` and `SQL_ADMIN_PASSWORD` which are tied to the stage (dev, test or prod). These are set via Azure and utilises Azure's key vault. This [blog](https://servian.dev/accessing-azure-key-vault-from-python-functions-44d548b49b37) gives a useful overview of how it's set-up.
 
 ### Deployment
 
@@ -92,9 +94,26 @@ LibCal is used by SLV to manage booking of its meeting rooms and other public sp
 
 The LibCal API is authenticated through the use of client credentials. This script uses the existing 'SLV API' app, credentials for which can be found here [https://slv-vic.libcal.com/admin/api/authentication](https://slv-vic.libcal.com/admin/api/authentication). **N.B.** You will need a LibCal admin logon to access this page.
 
-#### Logging
+### 2. Power BI Refresh Report
 
-Logging related to the LibCal operation can be found at two different levels:
+Power BI is the Library's dashboard software of choice and is used to create visualisations from a range of different data sources. Power BI allows admin users to configure scheduled refreshes of the data. In practice at SLV this is usually on an daily basis. This function summarises the success, failure or other statuses for the SLV's Power BI dashboards/workspaces, and returns a HTML string to be emailed as a daily update.
+
+#### Power BI Service Principal and API
+
+Microsoft provide a variety of API endpoints to help query and manage Power BI - [https://learn.microsoft.com/en-us/rest/api/power-bi/](https://learn.microsoft.com/en-us/rest/api/power-bi/). In order to use them, an authenticated user must retrieve an access token. To avoid tying the function to a person's SLV AD account, a service principal has been set-up, which acts as an autonomous app that can be authenticated against the Power BI admin APIs. Here is a useful link to help explain how aService Principal can be used in this context [https://learn.microsoft.com/en-us/power-bi/enterprise/read-only-apis-service-principal-authentication](https://learn.microsoft.com/en-us/power-bi/enterprise/read-only-apis-service-principal-authentication).
+
+For this function the `power-bi-monitor-app` service principal was created ([here in the azure portal](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/604459ec-de3c-4ea4-8e1e-37031c4c4c9e/isMSAApp~/false)). This app was then added to each Power BI workspace as an Admin user, instructions [here](https://learn.microsoft.com/en-us/power-bi/collaborate-share/service-give-access-new-workspaces).
+
+## Logging
+
+<!-- Logging related to the LibCal operation can be found at two different levels:
 
 1. At the 'Pipeline' level, which is scheduled to run daily and includes high level logging for each component of the pipeline, including the LibCal function: [link](https://adf.azure.com/en/monitoring/triggerruns?factory=%2Fsubscriptions%2Fb4a0deaa-b166-4231-b6b8-9b9a71a7c0d2%2FresourceGroups%2Fslv-dev-datafactory-rg%2Fproviders%2FMicrosoft.DataFactory%2Ffactories%2Fslv-dev-datafactory)
-2. At the Function level, which contains more detailed logging as defined in the code itself [link](https://portal.azure.com/#view/WebsitesExtension/FunctionMenuBlade/~/monitor/resourceId/%2Fsubscriptions%2Fb4a0deaa-b166-4231-b6b8-9b9a71a7c0d2%2FresourceGroups%2Fapp-ausse-dev-slv-adf-functions-rg%2Fproviders%2FMicrosoft.Web%2Fsites%2Fapp-ausse-dev-slv-adf-functions%2Ffunctions%2Flibcal)
+2. At the Function level, which contains more detailed logging as defined in the code itself [link](https://portal.azure.com/#view/WebsitesExtension/FunctionMenuBlade/~/monitor/resourceId/%2Fsubscriptions%2Fb4a0deaa-b166-4231-b6b8-9b9a71a7c0d2%2FresourceGroups%2Fapp-ausse-dev-slv-adf-functions-rg%2Fproviders%2FMicrosoft.Web%2Fsites%2Fapp-ausse-dev-slv-adf-functions%2Ffunctions%2Flibcal) -->
+
+Logging related to each pipeline/function happens at a variety of levels 🏴‍☠️:
+
+1. at the 'Pipeline' level useful information is logged in the 'Monitor' tab e.g for the **dev** data factory [monitor](https://adf.azure.com/en/monitoring/pipelineruns?factory=%2Fsubscriptions%2Fb4a0deaa-b166-4231-b6b8-9b9a71a7c0d2%2FresourceGroups%2Fslv-dev-datafactory-rg%2Fproviders%2FMicrosoft.DataFactory%2Ffactories%2Fslv-dev-datafactory).
+2. at the 'Function' level the logging is provided per invocation of the function, and directly reflects the logging defined in this repos code. For example, the function invocations for **dev power_bi_report** can be viewed [here](https://portal.azure.com/#view/WebsitesExtension/FunctionMenuBlade/~/monitor/resourceId/%2Fsubscriptions%2Fb4a0deaa-b166-4231-b6b8-9b9a71a7c0d2%2FresourceGroups%2Fapp-ausse-dev-slv-adf-functions-rg%2Fproviders%2FMicrosoft.Web%2Fsites%2Fapp-ausse-dev-slv-adf-functions%2Ffunctions%2Fpower_bi_report).
+
+**N.B.** it is worth high-lighting that Function logs usually have a delay of ~5mins from when the function has been invoked.

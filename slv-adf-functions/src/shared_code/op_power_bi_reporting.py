@@ -43,7 +43,6 @@ def create_power_bi_report_email():
             """
 
         workspace_refreshes[workspace] = {}
-        dataset_list = []
 
         for dataset_name, refresh_history in datasets.items():
 
