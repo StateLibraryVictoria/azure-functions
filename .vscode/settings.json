@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
-        "ezproxy"
+        "aiohttp",
+        "ezproxy",
+        "libcal",
+        "vemcount"
     ]
 }

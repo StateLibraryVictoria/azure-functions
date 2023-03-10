@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 
 import requests
 
-from . import shared_azure, shared_constants
+from . import op_libcal, shared_azure, shared_constants
 
 libcal_url = os.environ.get("LIBCAL_URL")
 libcal_client_secret = os.environ.get("LIBCAL_CLIENT_SECRET")
@@ -130,7 +130,7 @@ def format_booking_data(booking):
         list: List of values filtered from the booking argument supplied
     """
     formatted_booking_info = [
-        booking.get(field, "") for field in shared_constants.API_FIELDS
+        booking.get(field, "") for field in shared_constants.API_FIELDS["libcal"]
     ]
 
     return formatted_booking_info
@@ -196,3 +196,50 @@ def get_booking_data_to_upload(environment, last_date_retrieved):
 
     logging.info("Completed LibCal data extraction")
     return returned_values_upload_list
+
+
+def upload_libcal_data_to_azure():
+    """Coordinates the retrieval of data from Libcal and subsequent upload to Azure SQL database
+
+    Returns:
+        bool: Returns True/False to indicate success of the operation
+    """
+    environment = os.environ.get("ENVIRONMENT")
+    prefix = "stg"
+    operation = "libcal"
+
+    table_exists = shared_azure.check_if_table_exists(environment, operation, prefix)
+
+    if not table_exists:
+        shared_azure.create_azure_sql_table(environment, operation, prefix)
+        last_date_retrieved = datetime.strptime(
+            shared_constants.EARLIEST_DATE, "%Y-%m-%d"
+        ).date()
+    else:
+        last_date_retrieved = shared_azure.get_most_recent_date_in_db(
+            environment, operation, "fromDate", prefix="stg"
+        )
+        last_date_retrieved = datetime.strptime(
+            last_date_retrieved, "%Y-%m-%dT%H:%M:%S%z"
+        ).date()
+
+    logging.info(f"Last date retrieved: {last_date_retrieved}")
+
+    libcal_data_for_upload = op_libcal.get_booking_data_to_upload(
+        environment, last_date_retrieved
+    )
+    if libcal_data_for_upload == False:
+        logging.error("There was a problem retrieving data from LibCal")
+        return False
+
+    if len(libcal_data_for_upload) == 0:
+        logging.warning("No new data to extract from LibCal")
+        return False
+
+    logging.info(f"{len(libcal_data_for_upload)} rows extracted from LibCal")
+
+    upload_complete = shared_azure.bulk_upload_azure_database(
+        libcal_data_for_upload, environment, "libcal", prefix
+    )
+
+    return upload_complete
