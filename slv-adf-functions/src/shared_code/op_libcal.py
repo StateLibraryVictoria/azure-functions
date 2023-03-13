@@ -57,7 +57,7 @@ def get_libcal_information(endpoint):
     if r.status_code != 200:
         logging.error(r.text)
         return False
-    print(r.status_code)
+
     return r.json()
 
 
@@ -117,7 +117,7 @@ def get_users():
 
     users = get_libcal_information("appointments/bookings")
 
-    print(users)
+    return users
 
 
 def format_booking_data(booking):

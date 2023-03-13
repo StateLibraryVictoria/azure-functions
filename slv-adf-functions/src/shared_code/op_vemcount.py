@@ -80,7 +80,7 @@ def call_all_zones(zone_list, access_token, date_from, date_to):
         zone_info = get_vemcount_information(endpoint, access_token, "post")
         dates_info = zone_info["yesterday"][str(zone)]["dates"]
         data[zone] = dates_info
-        print(f"{len(dates_info)} rows retrieved for zone: {zone}")
+        logging.info(f"{len(dates_info)} rows retrieved for zone: {zone}")
 
     return data
 
@@ -97,7 +97,7 @@ def get_zone_info_for_upload(
 
     while form_date_to <= eo_month_yesterday:
         data = []
-        print(
+        logging.info(
             f"Retrieving data for {len(zone_list)} zone(s) between {form_date_from} and {form_date_to}"
         )
 
@@ -121,7 +121,7 @@ def get_zone_info_for_upload(
                 for date_value in date_values
             ]
             data.extend(vemcount_values)
-            print(
+            logging.info(
                 f"{len(vemcount_values)} lines for zone {zone} from {query_str_date_from} to {query_str_date_to} ready for upload"
             )
 
@@ -129,7 +129,7 @@ def get_zone_info_for_upload(
         form_date_to = form_date_from + timedelta(days=7)
 
         shared_azure.bulk_upload_azure_database(data, environment, operation, prefix)
-        print(f"{len(data)} lines added")
+        logging.info(f"{len(data)} lines added")
     return last_date_retrieved
 
 
@@ -165,6 +165,5 @@ def upload_vemcount_to_azure():
     last_date_retrieved = get_zone_info_for_upload(
         zones, operation, environment, prefix, last_date_retrieved, access_token
     )
-    print(last_date_retrieved)
 
     return True

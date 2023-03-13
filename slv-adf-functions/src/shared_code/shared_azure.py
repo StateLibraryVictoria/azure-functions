@@ -88,7 +88,7 @@ def query_azure_database(sql_statement, environment, return_data=False):
     username = os.environ.get("SQL_ADMIN_USER")
     password = os.environ.get("SQL_ADMIN_PASSWORD")
 
-    connection_string = f"Driver={{ODBC Driver 18 for SQL Server}};Server=tcp:slv-{environment}-sqldw.database.windows.net,1433;Database={environment}-edw;Uid={username};Pwd={{{password}}};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    connection_string = f"Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:slv-{environment}-sqldw.database.windows.net,1433;Database={environment}-edw;Uid={username};Pwd={{{password}}};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
 
     try:
         data_to_return = True
@@ -188,7 +188,7 @@ def bulk_upload_azure_database(data_for_upload, environment, operation, prefix=F
     sql = f"INSERT INTO [{table_name}] ({columns}) VALUES ({placeholders})"
     username = os.environ.get("SQL_ADMIN_USER")
     password = os.environ.get("SQL_ADMIN_PASSWORD")
-    connection_string = f"Driver={{ODBC Driver 18 for SQL Server}};Server=tcp:slv-{environment}-sqldw.database.windows.net,1433;Database={environment}-edw;Uid={username};Pwd={{{password}}};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    connection_string = f"Driver={{ODBC Driver 17 for SQL Server}};Server=tcp:slv-{environment}-sqldw.database.windows.net,1433;Database={environment}-edw;Uid={username};Pwd={{{password}}};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
     try:
         con = pyodbc.connect(connection_string)
         cursor = con.cursor()
