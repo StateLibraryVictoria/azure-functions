@@ -14,10 +14,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     logging.info("Beginning Libcal operation")
 
-    body_date = req.get_body()
-    last_date_retrieved = body_date.decode("utf-8")
+    # * Read and decode date passed as argument from the function invocation
+    req_body = req.get_body()
+    last_date_retrieved = req_body.decode("utf-8")
 
-    upload_complete = op_azure_sql.upload_libcal_data_to_azure(last_date_retrieved)
+    upload_complete = op_libcal.upload_libcal_data_to_azure(last_date_retrieved)
 
     if not upload_complete:
         msg = "Upload could not be completed"
