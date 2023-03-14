@@ -249,3 +249,17 @@ def authenticate_by_client_token():
     access_token = access_token.token
 
     return access_token
+
+
+storage_account_name = "slvproddatalake"
+account_url = f"https://{storage_account_name}.blob.core.windows.net"
+
+azure_client_id = os.environ.get("AZURE_CLIENT_ID")
+azure_client_secret = os.environ.get("AZURE_CLIENT_SECRET")
+azure_tenant_id = os.environ.get("AZURE_TENANT_ID")
+
+credentials = ClientSecretCredential(
+    client_id=azure_client_id,
+    client_secret=azure_client_secret,
+    tenant_id=azure_tenant_id,
+)

@@ -14,9 +14,13 @@ azure-identity = "*"
 azure-keyvault-secrets = "*"
 pyodbc = "*"
 pre-commit = "*"
+<<<<<<< HEAD
 pandas = "*"
 sqlalchemy = "*"
 aiohttp = "*"
+=======
+azure-storage-blob = "*"
+>>>>>>> main
 
 [dev-packages]
 
