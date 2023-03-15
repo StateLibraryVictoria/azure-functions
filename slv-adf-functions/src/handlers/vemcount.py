@@ -2,11 +2,11 @@ import logging
 
 import azure.functions as func
 
-from ..shared_code import op_libcal
+from ..shared_code import op_vemcount
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    """Handler for triggering the Libcal/Azure operations
+    """Handler for triggering the Vemcount operations
 
     Args:
         req (func.HttpRequest): matches the trigger configured in serverless.yaml
@@ -14,11 +14,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     logging.info("Beginning Libcal operation")
 
-    # * Read and decode date passed as argument from the function invocation
-    req_body = req.get_body()
-    last_date_retrieved = req_body.decode("utf-8")
-
-    upload_complete = op_libcal.upload_libcal_data_to_azure(last_date_retrieved)
+    upload_complete = op_vemcount.upload_vemcount_to_azure()
 
     if not upload_complete:
         msg = "Upload could not be completed"

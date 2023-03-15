@@ -79,8 +79,10 @@ You must replace `<stage_name>` with one of the following values: `dev`, `test` 
 Before deploying the function, it may be useful to invoke it locally for testing purposes. To do so run the following command, replacing `<function_name>` with the name of the Function as given in `serverless.yaml`:
 
 ```sh
-sls invoke --function <function_name>
+sls invoke --function <function_name> --log true --stage <stage>
 ```
+
+Th above includes the optional `--log true` flag, which means that any logging is returned in the command line. `--stage` is also optional, but for the configuration of this project it is required, this is to ensure that a stage is actively chosen, rather than relying on a default.
 
 Link to serverless CLI `invoke` documentation - [https://www.serverless.com/framework/docs/providers/azure/cli-reference/invoke](https://www.serverless.com/framework/docs/providers/azure/cli-reference/invoke)
 
@@ -105,11 +107,6 @@ Microsoft provide a variety of API endpoints to help query and manage Power BI -
 For this function the `power-bi-monitor-app` service principal was created ([here in the azure portal](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/604459ec-de3c-4ea4-8e1e-37031c4c4c9e/isMSAApp~/false)). This app was then added to each Power BI workspace as an Admin user, instructions [here](https://learn.microsoft.com/en-us/power-bi/collaborate-share/service-give-access-new-workspaces).
 
 ## Logging
-
-<!-- Logging related to the LibCal operation can be found at two different levels:
-
-1. At the 'Pipeline' level, which is scheduled to run daily and includes high level logging for each component of the pipeline, including the LibCal function: [link](https://adf.azure.com/en/monitoring/triggerruns?factory=%2Fsubscriptions%2Fb4a0deaa-b166-4231-b6b8-9b9a71a7c0d2%2FresourceGroups%2Fslv-dev-datafactory-rg%2Fproviders%2FMicrosoft.DataFactory%2Ffactories%2Fslv-dev-datafactory)
-2. At the Function level, which contains more detailed logging as defined in the code itself [link](https://portal.azure.com/#view/WebsitesExtension/FunctionMenuBlade/~/monitor/resourceId/%2Fsubscriptions%2Fb4a0deaa-b166-4231-b6b8-9b9a71a7c0d2%2FresourceGroups%2Fapp-ausse-dev-slv-adf-functions-rg%2Fproviders%2FMicrosoft.Web%2Fsites%2Fapp-ausse-dev-slv-adf-functions%2Ffunctions%2Flibcal) -->
 
 Logging related to each pipeline/function happens at a variety of levels 🏴‍☠️:
 

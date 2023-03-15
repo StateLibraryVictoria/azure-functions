@@ -1,7 +1,9 @@
+import asyncio
 import csv
 import logging
 import os
 
+import aiohttp
 import psycopg2
 
 
@@ -55,3 +57,31 @@ def export_to_csv(filename, data_to_write, column_names):
         write = csv.writer(f)
         write.writerow(column_names)
         write.writerows(data_to_write)
+
+
+def get_tasks(session, endpoints, access_token):
+    headers = {"Accept": "application/json", "Authorization": f"Bearer {access_token}"}
+    tasks = []
+    for endpoint in endpoints:
+        tasks.append(asyncio.create_task(session.post(endpoint, headers=headers)))
+    asyncio.sleep(2)
+    return tasks
+
+
+async def get_endpoints(endpoints, access_token):
+    results = []
+    connector = aiohttp.TCPConnector(limit_per_host=1)
+    async with aiohttp.ClientSession(connector=connector) as session:
+        tasks = get_tasks(session, endpoints, access_token)
+        responses = await asyncio.gather(*tasks)
+        for response in responses:
+            results.append(await response.json())
+    return results
+
+
+def async_call_endpoints(endpoints, access_token):
+
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    data = asyncio.run(get_endpoints(endpoints, access_token))
+
+    return data

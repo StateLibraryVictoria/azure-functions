@@ -22,6 +22,8 @@ provider:
     PBI_SECRET: ${env:PBI_SECRET}
     SQL_ADMIN_USER: ${env:SQL_ADMIN_USER}
     SQL_ADMIN_PASSWORD: ${env:SQL_ADMIN_PASSWORD}
+    VEMCOUNT_URL: ${env:VEMCOUNT_URL}
+    VEMCOUNT_API_KEY: ${env:VEMCOUNT_API_KEY}
 
 plugins:
   - serverless-azure-functions
@@ -51,6 +53,15 @@ functions:
           authLevel: anonymous
   power_bi_report:
     handler: src/handlers/power_bi.main
+    events:
+      - http: true
+        methods:
+          - get
+          - post
+        x-azure-settings:
+          authLevel: anonymous
+  vemcount:
+    handler: src/handlers/vemcount.main
     events:
       - http: true
         methods:
